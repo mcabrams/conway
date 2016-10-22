@@ -15,6 +15,16 @@ class LocationTestCase(unittest.TestCase):
         actual = [n.coordinates for n in location.neighbors]
         self.assertEqual(set(expected_neighbor_coordinates), set(actual))
 
+    def test_is_neighbor_of(self):
+        neighbor = Location(0, 0)
+        location = Location(0, 1)
+        self.assertTrue(neighbor.is_neighbor_of(location))
+
+    def test_distant_location_is_not_neighbor_of(self):
+        distant_location = Location(0, 0)
+        location = Location(0, 2)
+        self.assertFalse(distant_location.is_neighbor_of(location))
+
 
 class WorldTestCase(unittest.TestCase):
     def setUp(self):

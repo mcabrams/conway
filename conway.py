@@ -9,22 +9,25 @@ class Location():
 
     @property
     def neighbors(self):
-        top_neighbors, mid_neighbors, bottom_neighbors = [], [], []
-        for x in range(-1, 2):
-            neighbor = (x + self.x, 1 + self.y)
-            top_neighbors.append(neighbor)
+        return [Location(x, y) for x, y in self._neighbor_coordinates()]
 
-        for x in (-1, 1):
-            neighbor = (x + self.x, 0 + self.y)
-            mid_neighbors.append(neighbor)
+    def is_neighbor_of(self, location):
+        return location.coordinates in self._neighbor_coordinates()
 
-        for x in range(-1, 2):
-            neighbor = (x + self.x, -1 + self.y)
-            bottom_neighbors.append(neighbor)
+    def _neighbor_coordinates(self):
+        neighbors_coordinates = []
 
-        neighbor_coordinates = top_neighbors + mid_neighbors + bottom_neighbors
+        for x_offset in range(-1, 2):
+            for y_offset in range(-1, 2):
+                coordinates = (x_offset + self.x, y_offset + self.y)
 
-        return [Location(x, y) for x, y in neighbor_coordinates]
+                if coordinates == self.coordinates:
+                    continue
+
+                neighbors_coordinates.append(coordinates)
+
+        return neighbors_coordinates
+
 
 class World():
     def __init__(self):
