@@ -3,6 +3,29 @@ class Location():
         self.x = x
         self.y = y
 
+    @property
+    def coordinates(self):
+        return (self.x, self.y)
+
+    @property
+    def neighbors(self):
+        top_neighbors, mid_neighbors, bottom_neighbors = [], [], []
+        for x in range(-1, 2):
+            neighbor = (x + self.x, 1 + self.y)
+            top_neighbors.append(neighbor)
+
+        for x in (-1, 1):
+            neighbor = (x + self.x, 0 + self.y)
+            mid_neighbors.append(neighbor)
+
+        for x in range(-1, 2):
+            neighbor = (x + self.x, -1 + self.y)
+            bottom_neighbors.append(neighbor)
+
+        neighbor_coordinates = top_neighbors + mid_neighbors + bottom_neighbors
+
+        return [Location(x, y) for x, y in neighbor_coordinates]
+
 class World():
     def __init__(self):
         self.cells = []
@@ -44,7 +67,7 @@ class Cell():
         self.alive = alive
 
     def is_at(self, location):
-        return self.location == location
+        return self.location.coordinates == location.coordinates
 
     @property
     def is_alive(self):

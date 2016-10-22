@@ -3,6 +3,19 @@ import unittest
 from conway import Cell, Location, World
 
 
+class LocationTestCase(unittest.TestCase):
+    def test_location_has_coordinates(self):
+        location = Location(1, 1)
+        self.assertEqual(location.coordinates, (1, 1))
+
+    def test_neighbors(self):
+        location = Location(0, 0)
+        expected_neighbor_coordinates = [(0, 1), (1, 1), (1, 0), (1, -1),
+                                         (0, -1), (-1, -1), (-1, 0), (-1, 1)]
+        actual = [n.coordinates for n in location.neighbors]
+        self.assertEqual(set(expected_neighbor_coordinates), set(actual))
+
+
 class WorldTestCase(unittest.TestCase):
     def setUp(self):
         self.location = Location(1, 1)
@@ -63,6 +76,6 @@ class CellTestCase(unittest.TestCase):
         for coordinates in [(0, 0), (10, 10)]:
             location = Location(*coordinates)
             cell = Cell(location)
-            self.assertTrue(cell.is_at(location))
+            self.assertTrue(cell.is_at(Location(*coordinates)))
 
 unittest.main()
