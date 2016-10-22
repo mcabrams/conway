@@ -70,6 +70,12 @@ class WorldTestCase(unittest.TestCase):
         world = World()
         self.assertIsNone(world.get_cell_at(self.location))
 
+    def test_an_empty_world_stays_empty_after_a_tick(self):
+        world = World.empty()
+        next_world = world.tick()
+        self.assertTrue(next_world.is_empty)
+
+
 class CellTestCase(unittest.TestCase):
     def setUp(self):
         self.location = Location(1, 1)

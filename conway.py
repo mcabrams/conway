@@ -33,13 +33,9 @@ class World():
     def __init__(self):
         self.cells = []
 
-    @property
-    def _living_cells(self):
-        return [cell for cell in self.cells if cell.is_alive]
-
-    @property
-    def _living_cell_locations(self):
-        return [lc.location for lc in self._living_cells]
+    @classmethod
+    def empty(cls):
+        return cls()
 
     def set_dead_at(self, location):
         cell = self.get_cell_at(location)
@@ -59,9 +55,20 @@ class World():
     def is_alive_at(self, location):
         return location in self._living_cell_locations
 
+    def tick(self):
+        return self
+
     @property
     def is_empty(self):
         return len(self._living_cells) == 0
+
+    @property
+    def _living_cells(self):
+        return [cell for cell in self.cells if cell.is_alive]
+
+    @property
+    def _living_cell_locations(self):
+        return [lc.location for lc in self._living_cells]
 
 
 class Cell():
