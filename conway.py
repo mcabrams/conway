@@ -31,29 +31,33 @@ class Location():
 
 class World():
     def __init__(self):
-        self.cells = []
+        self._cells = []
 
     @classmethod
     def empty(cls):
         return cls()
 
     def set_dead_at(self, location):
-        cell = self.get_cell_at(location)
+        cell = self._find_cell_at(location)
         if cell:
-            self.cells.remove(cell)
+            cell.kill()
+        else:
+            self._add_cell(Cell(location, self, alive=False))
 
     def set_living_at(self, location):
-        self.cells.append(Cell(location))
+        self._add_cell(Cell(location, self))
 
     def get_cell_at(self, location):
-        cells_at_location = [c for c in self.cells if c.is_at(location)]
-        if cells_at_location:
-            return cells_at_location[0]
+        cell = self._find_cell_at(location)
+        if cell:
+            return cell
+        else:
+            self.set_dead_at(location)
+            return self.get_cell_at(location)
 
-        return None
 
     def is_alive_at(self, location):
-        return location in self._living_cell_locations
+        return location.coordinates in self._living_cell_coordinates
 
     def tick(self):
         return self
@@ -64,21 +68,59 @@ class World():
 
     @property
     def _living_cells(self):
-        return [cell for cell in self.cells if cell.is_alive]
+        return [cell for cell in self._cells if cell.is_alive]
 
     @property
     def _living_cell_locations(self):
         return [lc.location for lc in self._living_cells]
 
+    @property
+    def _living_cell_coordinates(self):
+        return [lcl.coordinates for lcl in self._living_cell_locations]
+
+    def _add_cell(self, cell):
+        self._cells.append(cell)
+
+    def _find_cell_at(self, location):
+        cells_at_location = [c for c in self._cells if c.is_at(location)]
+        if cells_at_location:
+            return cells_at_location[0]
+        else:
+            return None
+
+
 
 class Cell():
-    def __init__(self, location, alive=True):
+    def __init__(self, location, world, alive=True):
+        self.world = world
         self.location = location
         self.alive = alive
 
     def is_at(self, location):
         return self.location.coordinates == location.coordinates
 
+    def kill(self):
+        self.alive = False
+
     @property
     def is_alive(self):
         return self.alive
+
+    @property
+    def is_alive_next_generation(self):
+        if self._living_neighbor_count > 3:
+            return False
+
+        if self._living_neighbor_count > 2:
+            return True
+
+        return False
+
+    @property
+    def _living_neighbor_count(self):
+        neighbor_locations = self.location.neighbors
+        living_neighbor_cells = [self.world.get_cell_at(nl)
+                                 for nl in neighbor_locations
+                                 if self.world.is_alive_at(nl)]
+        return len(living_neighbor_cells)
+
