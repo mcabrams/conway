@@ -94,8 +94,16 @@ class WorldTestCase(unittest.TestCase):
 
 
 class CellTestCase(unittest.TestCase):
+    location_coordinates = (0, 0)
+    neighbor_coordinates = [(0, 1), (1, 1), (1, 0), (1, -1),
+                            (0, -1), (-1, -1), (-1, 0), (-1, 1)]
+
+    def _add_living_neighbors(self, count):
+        for coordinates in self.neighbor_coordinates[:count]:
+            self.world.set_living_at(Location(*coordinates))
+
     def setUp(self):
-        self.location = Location(1, 1)
+        self.location = Location(*self.location_coordinates)
         self.world = World()
 
     def test_a_new_cell_is_alive(self):
@@ -123,34 +131,32 @@ class CellTestCase(unittest.TestCase):
         self.assertFalse(cell.is_alive_next_generation)
 
     def test_cell_is_alive_next_generation_if_3_neighbors(self):
-        location = Location(0, 0)
-        self.world.set_living_at(location)
+        self.world.set_living_at(self.location)
+        self._add_living_neighbors(3)
 
-        for coordinates in [(0, 1), (1, 1), (1, 0)]:
-            location = Location(*coordinates)
-            self.world.set_living_at(location)
-
-        cell = self.world.get_cell_at(location)
+        cell = self.world.get_cell_at(self.location)
 
         self.assertTrue(cell.is_alive_next_generation)
 
     def test_cell_is_dead_from_overcrowding_next_gen_if_4_neighbors(self):
-        location = Location(0, 0)
-        self.world.set_living_at(location)
+        self.world.set_living_at(self.location)
+        self._add_living_neighbors(4)
 
-        for coordinates in [(0, 1), (1, 1), (1, 0), (1, -1)]:
-            location = Location(*coordinates)
-            self.world.set_living_at(location)
-
-        cell = self.world.get_cell_at(location)
+        cell = self.world.get_cell_at(self.location)
 
         self.assertFalse(cell.is_alive_next_generation)
 
     def test_lone_dead_cell_is_dead_next_generation(self):
-        location = Location(0, 0)
-        self.world.set_dead_at(location)
-        cell = self.world.get_cell_at(location)
+        self.world.set_dead_at(self.location)
+        cell = self.world.get_cell_at(self.location)
         self.assertFalse(cell.is_alive_next_generation)
 
+    def test_dead_cell_with_three_living_neighbors_is_alive_next_gen(self):
+        self.world.set_dead_at(self.location)
+        self._add_living_neighbors(3)
+
+        cell = self.world.get_cell_at(self.location)
+
+        self.assertTrue(cell.is_alive_next_generation)
 
 unittest.main()

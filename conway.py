@@ -108,6 +108,9 @@ class Cell():
 
     @property
     def is_alive_next_generation(self):
+        if not self.is_alive and self._living_neighbor_count == 3:
+            return True
+
         if self._living_neighbor_count > 3:
             return False
 
