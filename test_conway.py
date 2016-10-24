@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock
 
 from conway import Cell, Location, World
 
@@ -28,7 +29,7 @@ class LocationTestCase(unittest.TestCase):
 
 class WorldTestCase(unittest.TestCase):
     def setUp(self):
-        self.location = Location(1, 1)
+        self.location = Mock(name='location')
 
     def test_a_new_world_is_empty(self):
         world = World()
@@ -72,9 +73,12 @@ class WorldTestCase(unittest.TestCase):
         self.assertIsInstance(world.get_cell_at(self.location), Cell)
 
     def test_is_alive_at_not_dependent_on_location_instance(self):
+        self.location.coordinates = (0, 0)
         world = World()
         world.set_living_at(self.location)
+
         location = Location(*self.location.coordinates)
+
         self.assertTrue(world.is_alive_at(location))
 
     def test_can_get_cell_at_location(self):
