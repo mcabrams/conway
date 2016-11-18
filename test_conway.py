@@ -96,6 +96,26 @@ class WorldTestCase(unittest.TestCase):
         next_world = world.tick()
         self.assertTrue(next_world.is_empty)
 
+    def test_a_world_with_one_cell_is_empty_after_a_tick(self):
+        # Potential smell here, given that we have to use real location
+        # instance here for this to pass. Mock approach will not work.
+        self.location = Location(0, 0)
+
+        world = World.empty()
+        world.set_living_at(self.location)
+        next_world = world.tick()
+        self.assertTrue(next_world.is_empty)
+
+    #  def test_a_world_with_one_cell_is_empty_after_a_tick(self):
+        #  # Potential smell here, given that we have to use real location
+        #  # instance here for this to pass. Mock approach will not work.
+        #  self.location = Location(0, 0)
+
+        #  world = World.empty()
+        #  world.set_living_at(self.location)
+        #  next_world = world.tick()
+        #  self.assertTrue(next_world.is_empty)
+
 
 class CellTestCase(unittest.TestCase):
     location_coordinates = (0, 0)
@@ -114,9 +134,9 @@ class CellTestCase(unittest.TestCase):
         cell = Cell(self.location, self.world)
         self.assertTrue(cell.is_alive)
 
-    def test_a_killed_cell_is_not_alive(self):
+    def test_a_dead_cell_is_not_alive(self):
         cell = Cell(self.location, self.world)
-        cell.kill()
+        cell.die()
         self.assertFalse(cell.is_alive)
 
     def test_a_cell_can_be_set_dead(self):
@@ -134,9 +154,20 @@ class CellTestCase(unittest.TestCase):
         cell = self.world.get_cell_at(self.location)
         self.assertFalse(cell.is_alive_next_generation)
 
-    def test_cell_is_alive_next_generation_if_3_neighbors(self):
+    # TODO: Refactor this and below test into single one
+    def test_cell_is_still_alive_next_gen_if_in_stable_neighborhood(self):
+        stable_neighbor_range_min = Cell.STABLE_NEIGHBOR_RANGE[0]
         self.world.set_living_at(self.location)
-        self._add_living_neighbors(3)
+        self._add_living_neighbors(stable_neighbor_range_min)
+
+        cell = self.world.get_cell_at(self.location)
+
+        self.assertTrue(cell.is_alive_next_generation)
+
+    def test_cell_is_still_alive_next_gen_if_right_num_of_neighbors_high(self):
+        stable_neighbor_range_max = Cell.STABLE_NEIGHBOR_RANGE[-1]
+        self.world.set_living_at(self.location)
+        self._add_living_neighbors(stable_neighbor_range_max)
 
         cell = self.world.get_cell_at(self.location)
 

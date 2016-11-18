@@ -40,7 +40,7 @@ class World():
     def set_dead_at(self, location):
         cell = self._find_cell_at(location)
         if cell:
-            cell.kill()
+            cell.die()
         else:
             self._add_cell(Cell(location, self, alive=False))
 
@@ -55,11 +55,14 @@ class World():
             self.set_dead_at(location)
             return self.get_cell_at(location)
 
-
     def is_alive_at(self, location):
         return location.coordinates in self._living_cell_coordinates
 
     def tick(self):
+        for cell in self._cells:
+            if not cell.is_alive_next_generation:
+                cell.die()
+
         return self
 
     @property
@@ -89,8 +92,12 @@ class World():
             return None
 
 
-
+# TODO: What if a cell has less knowledge about its neighbors and just
+# knows the count of them?
 class Cell():
+    STABLE_NEIGHBOR_RANGE = range(2, 4)
+    FERTILE_NEIGHBOR_COUNT = 3
+
     def __init__(self, location, world, alive=True):
         self.world = world
         self.location = location
@@ -99,7 +106,7 @@ class Cell():
     def is_at(self, location):
         return self.location.coordinates == location.coordinates
 
-    def kill(self):
+    def die(self):
         self.alive = False
 
     @property
@@ -115,11 +122,11 @@ class Cell():
 
     @property
     def _has_stable_neighborhood(self):
-        return 2 < self._living_neighbor_count < 4
+        return self._living_neighbor_count in self.STABLE_NEIGHBOR_RANGE
 
     @property
     def _has_fertile_neighborhood(self):
-        return self._living_neighbor_count == 3
+        return self._living_neighbor_count == self.FERTILE_NEIGHBOR_COUNT
 
     @property
     def _living_neighbor_count(self):
@@ -128,4 +135,3 @@ class Cell():
                                  for nl in neighbor_locations
                                  if self.world.is_alive_at(nl)]
         return len(living_neighbor_cells)
-
