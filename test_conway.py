@@ -154,20 +154,17 @@ class CellTestCase(unittest.TestCase):
         cell = self.world.get_cell_at(self.location)
         self.assertFalse(cell.is_alive_next_generation)
 
-    # TODO: Refactor this and below test into single one
     def test_cell_is_still_alive_next_gen_if_in_stable_neighborhood(self):
-        stable_neighbor_range_min = Cell.STABLE_NEIGHBOR_RANGE[0]
+        for i in Cell.STABLE_NEIGHBOR_RANGE:
+            with self.subTest(stable_neighbor_count=i):
+                self.tearDown()
+                self.setUp()
+                self._assert_cell_is_alive_given_neighbor_count(i)
+                self.tearDown()
+
+    def _assert_cell_is_alive_given_neighbor_count(self, neighbor_count):
         self.world.set_living_at(self.location)
-        self._add_living_neighbors(stable_neighbor_range_min)
-
-        cell = self.world.get_cell_at(self.location)
-
-        self.assertTrue(cell.is_alive_next_generation)
-
-    def test_cell_is_still_alive_next_gen_if_right_num_of_neighbors_high(self):
-        stable_neighbor_range_max = Cell.STABLE_NEIGHBOR_RANGE[-1]
-        self.world.set_living_at(self.location)
-        self._add_living_neighbors(stable_neighbor_range_max)
+        self._add_living_neighbors(neighbor_count)
 
         cell = self.world.get_cell_at(self.location)
 
