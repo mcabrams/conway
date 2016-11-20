@@ -76,12 +76,14 @@ class WorldTestCase(unittest.TestCase):
         world.set_dead_at(self.location)
         self.assertIsInstance(world.get_cell_at(self.location), Cell)
 
+    # Smell, maybe unnecessary test?
     def test_is_alive_at_not_dependent_on_location_instance(self):
-        self.location.coordinates = (0, 0)
+        coordinates = (0, 0)
+        self.location = Location(*coordinates)
         world = World()
         world.set_living_at(self.location)
 
-        location = Location(*self.location.coordinates)
+        location = Location(*coordinates)
 
         self.assertTrue(world.is_alive_at(location))
 
@@ -122,77 +124,40 @@ class WorldTestCase(unittest.TestCase):
 
 
 class CellTestCase(unittest.TestCase):
-    location_coordinates = (0, 0)
-    neighbor_coordinates = [(0, 1), (1, 1), (1, 0), (1, -1),
-                            (0, -1), (-1, -1), (-1, 0), (-1, 1)]
-
-    def _add_living_neighbors(self, count):
-        for coordinates in self.neighbor_coordinates[:count]:
-            self.world.set_living_at(Location(*coordinates))
-
-    def setUp(self):
-        self.location = Location(*self.location_coordinates)
-        self.world = World()
-
     def test_a_new_cell_is_alive(self):
-        cell = Cell(self.location, self.world)
+        cell = Cell()
         self.assertTrue(cell.is_alive)
 
     def test_a_dead_cell_is_not_alive(self):
-        cell = Cell(self.location, self.world)
+        cell = Cell()
         cell.die()
         self.assertFalse(cell.is_alive)
 
     def test_a_cell_can_be_set_dead(self):
-        cell = Cell(self.location, self.world, alive=False)
+        cell = Cell(alive=False)
         self.assertFalse(cell.is_alive)
 
-    def test_cell_is_at_location(self):
-        for coordinates in [(0, 0), (10, 10)]:
-            location = Location(*coordinates)
-            cell = Cell(location, self.world)
-            self.assertTrue(cell.is_at(Location(*coordinates)))
-
     def test_cell_is_dead_next_generation_if_fewer_than_2_live_neighbors(self):
-        self.world.set_living_at(self.location)
-        cell = self.world.get_cell_at(self.location)
-        self.assertFalse(cell.is_alive_next_generation)
+        cell = Cell()
+        self.assertFalse(cell.is_alive_next_generation(1))
 
     def test_cell_is_still_alive_next_gen_if_in_stable_neighborhood(self):
         for i in Cell.STABLE_NEIGHBOR_RANGE:
             with self.subTest(stable_neighbor_count=i):
-                self.tearDown()
-                self.setUp()
-                self._assert_cell_is_alive_given_neighbor_count(i)
-                self.tearDown()
-
-    def _assert_cell_is_alive_given_neighbor_count(self, neighbor_count):
-        self.world.set_living_at(self.location)
-        self._add_living_neighbors(neighbor_count)
-
-        cell = self.world.get_cell_at(self.location)
-
-        self.assertTrue(cell.is_alive_next_generation)
+                cell = Cell()
+                cell.is_alive_next_generation(i)
+                self.assertTrue(cell.is_alive_next_generation)
 
     def test_cell_is_dead_from_overcrowding_next_gen_if_4_neighbors(self):
-        self.world.set_living_at(self.location)
-        self._add_living_neighbors(4)
-
-        cell = self.world.get_cell_at(self.location)
-
-        self.assertFalse(cell.is_alive_next_generation)
+        cell = Cell()
+        self.assertFalse(cell.is_alive_next_generation(4))
 
     def test_lone_dead_cell_is_dead_next_generation(self):
-        self.world.set_dead_at(self.location)
-        cell = self.world.get_cell_at(self.location)
-        self.assertFalse(cell.is_alive_next_generation)
+        cell = Cell(alive=False)
+        self.assertFalse(cell.is_alive_next_generation(0))
 
     def test_dead_cell_with_three_living_neighbors_is_alive_next_gen(self):
-        self.world.set_dead_at(self.location)
-        self._add_living_neighbors(3)
-
-        cell = self.world.get_cell_at(self.location)
-
-        self.assertTrue(cell.is_alive_next_generation)
+        cell = Cell()
+        self.assertTrue(cell.is_alive_next_generation(3))
 
 unittest.main()
