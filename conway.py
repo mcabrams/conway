@@ -1,8 +1,7 @@
-class Location():
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+from collections import namedtuple
 
+
+class Location(namedtuple('Location', ['x', 'y'])):
     @property
     def coordinates(self):
         return (self.x, self.y)

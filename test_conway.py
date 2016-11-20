@@ -26,6 +26,10 @@ class LocationTestCase(unittest.TestCase):
         location = Location(0, 2)
         self.assertFalse(distant_location.is_neighbor_of(location))
 
+    def test_instances_of_location_with_same_coordinates_should_be_equal(self):
+        location_a, location_b = Location(0, 0), Location(0, 0)
+        self.assertTrue(location_a == location_b)
+
 
 class WorldTestCase(unittest.TestCase):
     def setUp(self):
