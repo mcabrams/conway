@@ -21,6 +21,22 @@ class LocationTestCase(unittest.TestCase):
         self.assertTrue(location_a == location_b)
 
 
+def _get_location_cluster(cluster_number):
+    location = Location(0, 0)
+    return [location] + location.neighbors[:cluster_number]
+
+
+def _get_stable_world():
+    world = World()
+    stable_location_cluster = _get_location_cluster(
+        Cell.STABLE_NEIGHBOR_RANGE[0] + 1)
+
+    for location in stable_location_cluster:
+        world.set_living_at(location)
+
+    return world
+
+
 class WorldTestCase(unittest.TestCase):
     def setUp(self):
         self.location = Mock(name='location')
@@ -102,15 +118,10 @@ class WorldTestCase(unittest.TestCase):
         next_world = world.tick()
         self.assertTrue(next_world.is_empty)
 
-    #  def test_a_world_with_one_cell_is_empty_after_a_tick(self):
-        #  # Potential smell here, given that we have to use real location
-        #  # instance here for this to pass. Mock approach will not work.
-        #  self.location = Location(0, 0)
-
-        #  world = World.empty()
-        #  world.set_living_at(self.location)
-        #  next_world = world.tick()
-        #  self.assertTrue(next_world.is_empty)
+    def test_a_world_with_stable_neighborhood_is_not_empty_after_a_tick(self):
+        world = _get_stable_world()
+        next_world = world.tick()
+        self.assertFalse(next_world.is_empty)
 
 
 class CellTestCase(unittest.TestCase):

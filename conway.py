@@ -57,7 +57,7 @@ class World():
 
     def _get_living_neighbor_count(self, location):
         neighbor_locations = location.neighbors
-        living_neighbor_cells = [self.world.get_cell_at(nl)
+        living_neighbor_cells = [self.get_cell_at(nl)
                                  for nl in neighbor_locations
                                  if self.is_alive_at(nl)]
         return len(living_neighbor_cells)
