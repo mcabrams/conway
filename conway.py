@@ -10,9 +10,6 @@ class Location(namedtuple('Location', ['x', 'y'])):
     def neighbors(self):
         return [Location(x, y) for x, y in self._neighbor_coordinates()]
 
-    def is_neighbor_of(self, location):
-        return location.coordinates in self._neighbor_coordinates()
-
     def _neighbor_coordinates(self):
         neighbors_coordinates = []
 
