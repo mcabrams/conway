@@ -76,21 +76,23 @@ class World():
 
     @property
     def _living_cells(self):
-        return [cell for location, cell in self._cells.items() if cell.is_alive]
+        return [cell
+                for location, cell in self._cells.items()
+                if cell.is_alive]
 
     def _add_cell(self, cell, location):
         self._cells[location] = cell
 
     def _find_cell_at(self, location):
-        cells_at_location = [c for l, c in self._cells.items() if l == location]
+        cells_at_location = [c
+                             for l, c in self._cells.items()
+                             if l == location]
         if cells_at_location:
             return cells_at_location[0]
         else:
             return None
 
 
-# TODO: What if a cell has less knowledge about its neighbors and just
-# knows the count of them?
 class Cell():
     STABLE_NEIGHBOR_RANGE = range(2, 4)
     FERTILE_NEIGHBOR_COUNT = 3
