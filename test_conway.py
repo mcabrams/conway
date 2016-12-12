@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import Mock
 
-from conway import Cell, Location, World
+from conway import (Cell, Location, World, WorldRenderer, get_location_grid,
+                    get_max_coordinates, get_min_coordinates, sort_locations)
 
 
 class LocationTestCase(unittest.TestCase):
@@ -14,9 +15,9 @@ class LocationTestCase(unittest.TestCase):
         expected_neighbor_coordinates = [(0, 1), (1, 1), (1, 0), (1, -1),
                                          (0, -1), (-1, -1), (-1, 0), (-1, 1)]
         actual = [n.coordinates for n in location.neighbors]
-        self.assertEqual(set(expected_neighbor_coordinates), set(actual))
+        self.assertEqual(set(actual), set(expected_neighbor_coordinates))
 
-    def test_instances_of_location_with_same_coordinates_should_be_equal(self):
+    def test_instances_of_location_with_same_coordinates_are_equal(self):
         location_a, location_b = Location(0, 0), Location(0, 0)
         self.assertTrue(location_a == location_b)
 
@@ -122,6 +123,140 @@ class WorldTestCase(unittest.TestCase):
         world = _get_stable_world()
         next_world = world.tick()
         self.assertFalse(next_world.is_empty)
+
+    def test_living_locations_includes_living_cells(self):
+        world = World.empty()
+        world.set_living_at(self.location)
+        self.assertEqual(world.living_locations, [self.location])
+
+    def test_dead_locations_not_in_living_locations(self):
+        world = World.empty()
+        world.set_dead_at(self.location)
+        self.assertEqual(world.living_locations, [])
+
+
+class WorldRendererTestCase(unittest.TestCase):
+    def test_empty_world_renders_as_expected(self):
+        world = World.empty()
+        render = WorldRenderer(world).render()
+        expected = '-'
+        self.assertEqual(render, expected)
+
+    def test_world_with_lone_cell_renders_as_expected(self):
+        world = World.empty()
+        world.set_living_at(Location(0, 0))
+        render = WorldRenderer(world).render()
+        expected = '+'
+        self.assertEqual(render, expected)
+
+    def test_world_with_live_and_dead_cell_renders_as_expected(self):
+        world = World.empty()
+        world.set_living_at(Location(0, 0))
+        world.set_living_at(Location(2, 0))
+        render = WorldRenderer(world).render()
+        expected = '+-+'
+        self.assertEqual(render, expected)
+
+    def test_world_that_is_vertical_renders_properly(self):
+        world = World.empty()
+        world.set_living_at(Location(0, 0))
+        world.set_living_at(Location(0, 2))
+        render = WorldRenderer(world).render()
+        expected = ('+\n'
+                    '-\n'
+                    '+')
+        self.assertEqual(render, expected)
+
+
+class GetMinCoordinatesTestCase(unittest.TestCase):
+    def test_with_one_location(self):
+        actual = get_min_coordinates([Location(0, 0)])
+        self.assertEqual(actual, (0, 0))
+
+    def test_with_multiple_locations(self):
+        actual = get_min_coordinates([Location(1, 0), Location(0, 7),
+                                      Location(5, -3)])
+        self.assertEqual(actual, (0, -3))
+
+
+class GetMaxCoordinatesTestCase(unittest.TestCase):
+    def test_with_one_location(self):
+        actual = get_max_coordinates([Location(0, 0)])
+        self.assertEqual(actual, (0, 0))
+
+    def test_with_multiple_locations(self):
+        actual = get_max_coordinates([Location(1, 0), Location(0, 7),
+                                      Location(5, -3)])
+        self.assertEqual(actual, (5, 7))
+
+
+class SortLocationsTestCase(unittest.TestCase):
+    def test_lone_location_returns_lone_location(self):
+        actual = sort_locations([Location(0, 0)])
+        expected = {
+            0: [Location(0, 0)]
+        }
+        self.assertEqual(dict(actual), expected)
+
+    def test_locations_indexed_by_x_axis(self):
+        sorted_locations = sort_locations([Location(0, 0), Location(1, 0)])
+        expected = {
+            0: [Location(0, 0)],
+            1: [Location(1, 0)]
+        }
+        self.assertEqual(dict(sorted_locations), expected)
+
+    def test_locations_at_same_x_coordinate_sorted_by_asc_y_coordinate(self):
+        sorted_locations = sort_locations([Location(0, 0), Location(0, -1),
+                                           Location(0, 1)])
+        expected = {
+            0: [Location(0, -1), Location(0, 0), Location(0, 1)]
+        }
+        self.assertEqual(dict(sorted_locations), expected)
+
+    def test_locations_keyed_and_sorted_together(self):
+        sorted_locations = sort_locations([Location(0, 0), Location(0, -1),
+                                           Location(0, 1), Location(1, 0),
+                                           Location(-1, 0), Location(-1, 2)])
+        expected = {
+            -1: [Location(-1, 0), Location(-1, 2)],
+            0: [Location(0, -1), Location(0, 0), Location(0, 1)],
+            1: [Location(1, 0)]
+        }
+        self.assertEqual(dict(sorted_locations), expected)
+
+    def test_indexed_by_y_coordinates(self):
+        sorted_locations = sort_locations([Location(0, 0), Location(0, 1),
+                                           Location(1, 0), Location(1, 1)],
+                                          indexed_by='y')
+        expected = {
+            0: [Location(0, 0), Location(1, 0)],
+            1: [Location(0, 1), Location(1, 1)]
+        }
+
+        self.assertEqual(dict(sorted_locations), expected)
+
+    def test_indexed_by_non_x_or_y_coordinate_raises_value_error(self):
+        with self.assertRaises(ValueError):
+            sort_locations([Location(0, 0)], indexed_by='z')
+
+
+class GetLocationGridTestCase(unittest.TestCase):
+    def test_same_start_end(self):
+        actual = get_location_grid(Location(0, 0), Location(0, 0))
+        expected = {
+            0: [Location(0, 0)]
+        }
+        self.assertEqual(dict(actual), expected)
+
+    def test_with_proper_minimum_and_maximum(self):
+        actual = get_location_grid(Location(0, 0), Location(2, 2))
+        expected = {
+            0: [Location(0, 0), Location(1, 0), Location(2, 0)],
+            1: [Location(0, 1), Location(1, 1), Location(2, 1)],
+            2: [Location(0, 2), Location(1, 2), Location(2, 2)]
+        }
+        self.assertEqual(dict(actual), expected)
 
 
 class CellTestCase(unittest.TestCase):
