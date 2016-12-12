@@ -58,29 +58,21 @@ def get_location_grid(lower_bound_location, upper_bound_location):
         for y in y_range:
             locations.append(Location(x, y))
 
-    rows = sort_locations(locations, indexed_by='y')
+    rows = sort_locations(locations)
 
     return rows
 
 
-def sort_locations(locations, indexed_by='x'):
+def sort_locations(locations):
     """ Returns dict with keys representing x-coordinate int, and value being
     a list of Locations containing that x-coordinate, sorted by y-coordinate
     in ascending order """
 
-    if indexed_by not in ('x', 'y'):
-        raise ValueError("indexed_by must either be 'x' or 'y'!")
-
     rows = defaultdict(list)
 
     for location in locations:
-        locations_index_key = getattr(location, indexed_by)
-
-        values_ascend_by = 'y' if indexed_by == 'x' else 'x'
-
-        rows[locations_index_key].append(location)
-        rows[locations_index_key].sort(
-            key=lambda location: getattr(location, values_ascend_by))
+        rows[location.y].append(location)
+        rows[location.y].sort(key=lambda location: location.x)
 
     return rows
 
@@ -171,7 +163,7 @@ class WorldRenderer():
         lower_bound_location = Location(*min_coordinate)
         upper_bound_location = Location(*max_coordinate)
 
-        sorted_locations = sort_locations(living_locations, indexed_by='y')
+        sorted_locations = sort_locations(living_locations)
         grid_locations = get_location_grid(lower_bound_location,
                                            upper_bound_location)
 

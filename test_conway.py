@@ -198,47 +198,31 @@ class SortLocationsTestCase(unittest.TestCase):
         }
         self.assertEqual(dict(actual), expected)
 
-    def test_locations_indexed_by_x_axis(self):
-        sorted_locations = sort_locations([Location(0, 0), Location(1, 0)])
+    def test_locations_indexed_by_y_axis(self):
+        sorted_locations = sort_locations([Location(0, 1), Location(0, 0)])
         expected = {
             0: [Location(0, 0)],
-            1: [Location(1, 0)]
+            1: [Location(0, 1)]
         }
         self.assertEqual(dict(sorted_locations), expected)
 
-    def test_locations_at_same_x_coordinate_sorted_by_asc_y_coordinate(self):
-        sorted_locations = sort_locations([Location(0, 0), Location(0, -1),
-                                           Location(0, 1)])
+    def test_locations_at_same_y_coordinate_sorted_by_asc_x_coordinate(self):
+        sorted_locations = sort_locations([Location(0, 0), Location(-1, 0),
+                                           Location(1, 0)])
         expected = {
-            0: [Location(0, -1), Location(0, 0), Location(0, 1)]
+            0: [Location(-1, 0), Location(0, 0), Location(1, 0)]
         }
         self.assertEqual(dict(sorted_locations), expected)
 
     def test_locations_keyed_and_sorted_together(self):
-        sorted_locations = sort_locations([Location(0, 0), Location(0, -1),
-                                           Location(0, 1), Location(1, 0),
-                                           Location(-1, 0), Location(-1, 2)])
-        expected = {
-            -1: [Location(-1, 0), Location(-1, 2)],
-            0: [Location(0, -1), Location(0, 0), Location(0, 1)],
-            1: [Location(1, 0)]
-        }
-        self.assertEqual(dict(sorted_locations), expected)
-
-    def test_indexed_by_y_coordinates(self):
         sorted_locations = sort_locations([Location(0, 0), Location(0, 1),
-                                           Location(1, 0), Location(1, 1)],
-                                          indexed_by='y')
+                                           Location(1, 0), Location(1, 1)])
         expected = {
             0: [Location(0, 0), Location(1, 0)],
             1: [Location(0, 1), Location(1, 1)]
         }
 
         self.assertEqual(dict(sorted_locations), expected)
-
-    def test_indexed_by_non_x_or_y_coordinate_raises_value_error(self):
-        with self.assertRaises(ValueError):
-            sort_locations([Location(0, 0)], indexed_by='z')
 
 
 class GetLocationGridTestCase(unittest.TestCase):
