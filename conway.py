@@ -25,16 +25,16 @@ class Location(namedtuple('Location', ['x', 'y'])):
         return neighbors_coordinates
 
 
-def get_min_coordinates(locations):
+def get_min_coordinates_location(locations):
     location_with_min_x = min(locations, key=lambda location: location.x)
     location_with_min_y = min(locations, key=lambda location: location.y)
-    return location_with_min_x.x, location_with_min_y.y
+    return Location(location_with_min_x.x, location_with_min_y.y)
 
 
-def get_max_coordinates(locations):
+def get_max_coordinates_location(locations):
     location_with_max_x = max(locations, key=lambda location: location.x)
     location_with_max_y = max(locations, key=lambda location: location.y)
-    return location_with_max_x.x, location_with_max_y.y
+    return Location(location_with_max_x.x, location_with_max_y.y)
 
 
 def get_location_grid(lower_bound_location, upper_bound_location):
@@ -158,10 +158,8 @@ class WorldRenderer():
         if not living_locations:
             return '-'
 
-        min_coordinate = get_min_coordinates(living_locations)
-        max_coordinate = get_max_coordinates(living_locations)
-        lower_bound_location = Location(*min_coordinate)
-        upper_bound_location = Location(*max_coordinate)
+        lower_bound_location = get_min_coordinates_location(living_locations)
+        upper_bound_location = get_max_coordinates_location(living_locations)
 
         sorted_locations = sort_locations(living_locations)
         grid_locations = get_location_grid(lower_bound_location,

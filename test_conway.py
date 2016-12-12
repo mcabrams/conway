@@ -2,7 +2,8 @@ import unittest
 from unittest.mock import Mock
 
 from conway import (Cell, Location, World, WorldRenderer, get_location_grid,
-                    get_max_coordinates, get_min_coordinates, sort_locations)
+                    get_max_coordinates_location, get_min_coordinates_location,
+                    sort_locations)
 
 
 class LocationTestCase(unittest.TestCase):
@@ -168,26 +169,26 @@ class WorldRendererTestCase(unittest.TestCase):
         self.assertEqual(render, expected)
 
 
-class GetMinCoordinatesTestCase(unittest.TestCase):
+class GetMinCoordinatesLocationTestCase(unittest.TestCase):
     def test_with_one_location(self):
-        actual = get_min_coordinates([Location(0, 0)])
-        self.assertEqual(actual, (0, 0))
+        actual = get_min_coordinates_location([Location(0, 0)])
+        self.assertEqual(actual, Location(0, 0))
 
     def test_with_multiple_locations(self):
-        actual = get_min_coordinates([Location(1, 0), Location(0, 7),
-                                      Location(5, -3)])
-        self.assertEqual(actual, (0, -3))
+        actual = get_min_coordinates_location([Location(1, 0), Location(0, 7),
+                                               Location(5, -3)])
+        self.assertEqual(actual, Location(0, -3))
 
 
-class GetMaxCoordinatesTestCase(unittest.TestCase):
+class GetMaxCoordinatesLocationTestCase(unittest.TestCase):
     def test_with_one_location(self):
-        actual = get_max_coordinates([Location(0, 0)])
-        self.assertEqual(actual, (0, 0))
+        actual = get_max_coordinates_location([Location(0, 0)])
+        self.assertEqual(actual, Location(0, 0))
 
     def test_with_multiple_locations(self):
-        actual = get_max_coordinates([Location(1, 0), Location(0, 7),
-                                      Location(5, -3)])
-        self.assertEqual(actual, (5, 7))
+        actual = get_max_coordinates_location([Location(1, 0), Location(0, 7),
+                                               Location(5, -3)])
+        self.assertEqual(actual, Location(5, 7))
 
 
 class SortLocationsTestCase(unittest.TestCase):
