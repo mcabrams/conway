@@ -1,80 +1,7 @@
-from collections import defaultdict, namedtuple
-
-
-class Location(namedtuple('Location', ['x', 'y'])):
-    @property
-    def coordinates(self):
-        return (self.x, self.y)
-
-    @property
-    def neighbors(self):
-        return [Location(x, y) for x, y in self._neighbor_coordinates()]
-
-    def _neighbor_coordinates(self):
-        neighbors_coordinates = []
-
-        for x_offset in range(-1, 2):
-            for y_offset in range(-1, 2):
-                coordinates = (x_offset + self.x, y_offset + self.y)
-
-                if coordinates == self.coordinates:
-                    continue
-
-                neighbors_coordinates.append(coordinates)
-
-        return neighbors_coordinates
-
-
-def get_min_coordinates_location(locations):
-    location_with_min_x = min(locations, key=lambda location: location.x)
-    location_with_min_y = min(locations, key=lambda location: location.y)
-    return Location(location_with_min_x.x, location_with_min_y.y)
-
-
-def get_max_coordinates_location(locations):
-    location_with_max_x = max(locations, key=lambda location: location.x)
-    location_with_max_y = max(locations, key=lambda location: location.y)
-    return Location(location_with_max_x.x, location_with_max_y.y)
-
-
-def get_location_grid(lower_bound_location, upper_bound_location):
-    """ Returns dict with keys corresponding to x coordinates (ascending), and
-    values that are lists of locations that fall in that x coordinate, in
-    ascending y coordinate value.
-
-    args:
-        lower_bound_location: a location with coordinates representing minimum
-            x and y coordinates to be represented in location grid
-        upper_bound_location: a location with coordinates representing maximum
-            x and y coordinates to be represented in location grid
-    """
-    rows = defaultdict(list)
-
-    x_range = range(lower_bound_location.x, upper_bound_location.x + 1)
-    y_range = range(lower_bound_location.y, upper_bound_location.y + 1)
-
-    locations = []
-    for x in x_range:
-        for y in y_range:
-            locations.append(Location(x, y))
-
-    rows = sort_locations(locations)
-
-    return rows
-
-
-def sort_locations(locations):
-    """ Returns dict with keys representing x-coordinate int, and value being
-    a list of Locations containing that x-coordinate, sorted by y-coordinate
-    in ascending order """
-
-    rows = defaultdict(list)
-
-    for location in locations:
-        rows[location.y].append(location)
-        rows[location.y].sort(key=lambda location: location.x)
-
-    return rows
+from .cell import Cell
+from .location import (get_max_coordinates_location,
+                       get_min_coordinates_location, sort_locations,
+                       get_location_grid)
 
 
 class World():
@@ -191,30 +118,3 @@ class WorldRenderer():
             rendering += '+' if location in living_locations else '-'
 
         return rendering
-
-
-class Cell():
-    STABLE_NEIGHBOR_RANGE = range(2, 4)
-    FERTILE_NEIGHBOR_COUNT = 3
-
-    def __init__(self, alive=True):
-        self.alive = alive
-
-    def die(self):
-        self.alive = False
-
-    @property
-    def is_alive(self):
-        return self.alive
-
-    def is_alive_next_generation(self, neighbor_count):
-        if self.is_alive:
-            return self._has_stable_neighborhood(neighbor_count)
-        else:
-            return self._has_fertile_neighborhood(neighbor_count)
-
-    def _has_stable_neighborhood(self, neighbor_count):
-        return neighbor_count in self.STABLE_NEIGHBOR_RANGE
-
-    def _has_fertile_neighborhood(self, neighbor_count):
-        return neighbor_count == self.FERTILE_NEIGHBOR_COUNT

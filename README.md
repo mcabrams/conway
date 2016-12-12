@@ -8,4 +8,4 @@ Run:
 
 1: ```docker build -t conway .```
 2: ```docker run -v "$PWD":/conway -it conway bash```
-3; ```python test_conway.py```
+3; ```python -m unittest```
