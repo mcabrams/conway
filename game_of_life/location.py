@@ -26,12 +26,16 @@ class Location(namedtuple('Location', ['x', 'y'])):
 
 
 def get_min_coordinates_location(locations):
+    """ From a list of Locations, get a location with coordinates representing
+    the minimum x and y coordinate found in all location coordinates """
     location_with_min_x = min(locations, key=lambda location: location.x)
     location_with_min_y = min(locations, key=lambda location: location.y)
     return Location(location_with_min_x.x, location_with_min_y.y)
 
 
 def get_max_coordinates_location(locations):
+    """ From a list of Locations, get a location with coordinates representing
+    the maximum x and y coordinate found in all location coordinates """
     location_with_max_x = max(locations, key=lambda location: location.x)
     location_with_max_y = max(locations, key=lambda location: location.y)
     return Location(location_with_max_x.x, location_with_max_y.y)
