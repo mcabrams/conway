@@ -41,30 +41,38 @@ def get_max_coordinates_location(locations):
     return Location(location_with_max_x.x, location_with_max_y.y)
 
 
-def get_location_grid(lower_bound_location, upper_bound_location):
-    """ Returns dict with keys corresponding to x coordinates (ascending), and
-    values that are lists of locations that fall in that x coordinate, in
-    ascending y coordinate value.
+class LocationGrid:
+    def __init__(self, lower_bound_location, upper_bound_location):
+        """
+        args:
+            lower_bound_location: a location with coordinates representing
+                minimum x and y coordinates to be represented in location grid
+            upper_bound_location: a location with coordinates representing
+                maximum x and y coordinates to be represented in location grid
+        """
+        self.lower_bound_location = lower_bound_location
+        self.upper_bound_location = upper_bound_location
 
-    args:
-        lower_bound_location: a location with coordinates representing minimum
-            x and y coordinates to be represented in location grid
-        upper_bound_location: a location with coordinates representing maximum
-            x and y coordinates to be represented in location grid
-    """
-    rows = defaultdict(list)
+    def get_rows(self):
+        """ Returns dict with keys corresponding to x coordinates (ascending), and
+        values that are lists of locations that fall in that x coordinate, in
+        ascending y coordinate value.
+        """
+        rows = defaultdict(list)
 
-    x_range = range(lower_bound_location.x, upper_bound_location.x + 1)
-    y_range = range(lower_bound_location.y, upper_bound_location.y + 1)
+        x_range = range(self.lower_bound_location.x,
+                        self.upper_bound_location.x + 1)
+        y_range = range(self.lower_bound_location.y,
+                        self.upper_bound_location.y + 1)
 
-    locations = []
-    for x in x_range:
-        for y in y_range:
-            locations.append(Location(x, y))
+        locations = []
+        for x in x_range:
+            for y in y_range:
+                locations.append(Location(x, y))
 
-    rows = sort_locations(locations)
+        rows = sort_locations(locations)
 
-    return rows
+        return rows
 
 
 def sort_locations(locations):

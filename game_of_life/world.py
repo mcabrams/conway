@@ -1,5 +1,5 @@
 from .cell import Cell
-from .location import (Location, sort_locations, get_location_grid)
+from .location import (LocationGrid, Location, sort_locations)
 
 DEFAULT_MIN_LOCATION = Location(0, 0)
 DEFAULT_MAX_LOCATION = Location(0, 0)
@@ -61,12 +61,25 @@ class World():
         return len(living_neighbor_cells)
 
     def tick(self):
+        # Shortcoming is that this only accounts for living cells
         for location, cell in self._cells.items():
             neighbor_count = self._get_living_neighbor_count(location)
             if not cell.is_alive_next_generation(neighbor_count):
                 cell.die()
 
         return self
+
+        # To handle shortcoming where we only iterate over cells that are in
+        # the living cell we need to incorporate some way of iterating over
+        # cells that are dead as well. One thought is to rely on getting a
+        # grid location (all possible locations) and then a sort location
+        # (which will cover living cells), and then we should be able to
+        # iterate over all. We likely need someway handling cells that are on
+        # the border of are grid (maybe not, we'll see). Another thought that
+        # comes to mind is whether the current model for location grid should
+        # be modified; in this case we really need a list of locations, and
+        # don't care much about the y/x index, but we do care about whether
+        # a  cell is dead or alive.
 
     @property
     def is_empty(self):
@@ -111,8 +124,8 @@ class WorldRenderer():
         living_locations = self.world.living_locations
 
         sorted_locations = sort_locations(living_locations)
-        grid_locations = get_location_grid(self.world.min_location,
-                                           self.world.max_location)
+        location_grid = LocationGrid(self.world.min_location,
+                                     self.world.max_location)
 
         rendering = ''
 
@@ -121,7 +134,7 @@ class WorldRenderer():
                             for location_list in location_lists
                             for sub_location in location_list]
 
-        grid_locations_sorted_by_y_desc = sorted(grid_locations.items(),
+        grid_locations_sorted_by_y_desc = sorted(location_grid.get_rows().items(),
                                                  key=lambda item: item[0],
                                                  reverse=True)
 

@@ -1,6 +1,6 @@
 import unittest
 
-from game_of_life.location import (Location, get_location_grid,
+from game_of_life.location import (LocationGrid, Location,
                                    get_max_coordinates_location,
                                    get_min_coordinates_location,
                                    sort_locations)
@@ -80,16 +80,16 @@ class SortLocationsTestCase(unittest.TestCase):
         self.assertEqual(dict(sorted_locations), expected)
 
 
-class GetLocationGridTestCase(unittest.TestCase):
+class LocationGridGetRowsTestCase(unittest.TestCase):
     def test_same_start_end(self):
-        actual = get_location_grid(Location(0, 0), Location(0, 0))
+        actual = LocationGrid(Location(0, 0), Location(0, 0)).get_rows()
         expected = {
             0: [Location(0, 0)]
         }
         self.assertEqual(dict(actual), expected)
 
     def test_with_proper_minimum_and_maximum(self):
-        actual = get_location_grid(Location(0, 0), Location(2, 2))
+        actual = LocationGrid(Location(0, 0), Location(2, 2)).get_rows()
         expected = {
             0: [Location(0, 0), Location(1, 0), Location(2, 0)],
             1: [Location(0, 1), Location(1, 1), Location(2, 1)],
