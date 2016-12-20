@@ -3,7 +3,8 @@ from unittest.mock import Mock
 
 from game_of_life.cell import Cell
 from game_of_life.location import Location
-from game_of_life.world import World
+from game_of_life.render_to_world import render_to_world
+from game_of_life.world import World, WorldRenderer
 
 
 def _get_location_cluster(cluster_number):
@@ -24,7 +25,7 @@ def _get_stable_world():
 
 class WorldTestCase(unittest.TestCase):
     def setUp(self):
-        self.location = Mock(name='location')
+        self.location = Location(0, 0)
 
     def test_a_new_world_is_empty(self):
         world = World()
@@ -117,3 +118,79 @@ class WorldTestCase(unittest.TestCase):
         world = World.empty()
         world.set_dead_at(self.location)
         self.assertEqual(world.living_locations, [])
+
+    def test_world_progresses_next_expected_outcome_after_a_tick(self):
+        render = ('-+-\n'
+                  '--+')
+        expected_render_after_tick = ('---\n'
+                                      '---')
+
+        world = render_to_world(render)
+        world = world.tick()
+        actual = WorldRenderer(world).render()
+        self.assertEqual(expected_render_after_tick, actual)
+
+        render = ('-+-\n'
+                  '-++')
+        expected_render_after_tick = ('-++\n'
+                                      '-++')
+
+        world = render_to_world(render)
+        world = world.tick()
+        actual = WorldRenderer(world).render()
+        self.assertEqual(expected_render_after_tick, actual,
+                         msg='\n\nExpected: \n{}\nBut instead got: \n{}'
+                             .format(expected_render_after_tick, actual))
+
+    def test_an_empty_world_with_10_by_10_dimensions_has_100_dead_cells(self):
+        world = World.empty(min_location=Location(0, 0),
+                            max_location=Location(9, 9))
+        self.assertEqual(world.dead_cell_count, 100)
+
+    def test_an_empty_world_with_2_by_2_dimensions_has_4_dead_cells(self):
+        world = World.empty(min_location=Location(0, 0),
+                            max_location=Location(1, 1))
+        self.assertEqual(world.dead_cell_count, 4)
+
+    def test_2_by_2_world_with_one_living_cell_has_3_dead_cells(self):
+        world = World.empty(min_location=Location(0, 0),
+                            max_location=Location(1, 1))
+        world.set_living_at(self.location)
+        self.assertEqual(world.dead_cell_count, 3)
+
+    def test_world_has_default_dimensions(self):
+        world = World.empty()
+        self.assertEqual((1, 1), world.dimensions)
+
+    def test_world_dimensions_come_from_min_max_locations(self):
+        world = World.empty(min_location=Location(0, 0),
+                            max_location=Location(3, 3))
+        self.assertEqual((4, 4), world.dimensions)
+
+    def test_set_living_at_beyond_max_location_x_expands_max_location(self):
+        world = World.empty(min_location=Location(0, 0),
+                            max_location=Location(3, 3))
+
+        world.set_living_at(Location(4, 0))
+        self.assertEqual(world.dimensions, (5, 4))
+
+    def test_set_living_at_beyond_max_location_y_expands_max_location(self):
+        world = World.empty(min_location=Location(0, 0),
+                            max_location=Location(3, 3))
+
+        world.set_living_at(Location(0, 4))
+        self.assertEqual(world.dimensions, (4, 5))
+
+    def test_set_living_at_below_min_location_x_lowers_min_location(self):
+        world = World.empty(min_location=Location(0, 0),
+                            max_location=Location(3, 3))
+
+        world.set_living_at(Location(-1, 0))
+        self.assertEqual(world.dimensions, (5, 4))
+
+    def test_set_living_at_below_min_location_y_lowers_min_location(self):
+        world = World.empty(min_location=Location(0, 0),
+                            max_location=Location(3, 3))
+
+        world.set_living_at(Location(0, -1))
+        self.assertEqual(world.dimensions, (4, 5))

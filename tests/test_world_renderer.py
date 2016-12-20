@@ -35,3 +35,11 @@ class WorldRendererTestCase(unittest.TestCase):
                     '-\n'
                     '+')
         self.assertEqual(render, expected)
+
+    def test_world_renders_according_to_dimensions(self):
+        world = World.empty(min_location=Location(0, 0),
+                            max_location=Location(2, 0))
+
+        render = WorldRenderer(world).render()
+        expected = ('---')
+        self.assertEqual(render, expected)

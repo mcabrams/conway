@@ -1,16 +1,20 @@
 from .cell import Cell
-from .location import (get_max_coordinates_location,
-                       get_min_coordinates_location, sort_locations,
-                       get_location_grid)
+from .location import (Location, sort_locations, get_location_grid)
+
+DEFAULT_MIN_LOCATION = Location(0, 0)
+DEFAULT_MAX_LOCATION = Location(0, 0)
 
 
 class World():
-    def __init__(self):
+    def __init__(self, min_location=DEFAULT_MIN_LOCATION,
+                 max_location=DEFAULT_MAX_LOCATION):
         self._cells = {}
+        self.min_location = min_location
+        self.max_location = max_location
 
     @classmethod
-    def empty(cls):
-        return cls()
+    def empty(cls, *args, **kwargs):
+        return cls(*args, **kwargs)
 
     def set_dead_at(self, location):
         cell = self._find_cell_at(location)
@@ -20,6 +24,18 @@ class World():
             self._add_cell(Cell(alive=False), location)
 
     def set_living_at(self, location):
+        if location.x > self.max_location.x:
+            self.max_location = Location(location.x, self.max_location.y)
+
+        if location.y > self.max_location.y:
+            self.max_location = Location(self.max_location.x, location.y)
+
+        if location.x < self.min_location.x:
+            self.min_location = Location(location.x, self.min_location.y)
+
+        if location.y < self.min_location.y:
+            self.min_location = Location(self.min_location.x, location.y)
+
         self._add_cell(Cell(), location)
 
     def get_cell_at(self, location):
@@ -57,6 +73,18 @@ class World():
         return len(self._living_cells) == 0
 
     @property
+    def dead_cell_count(self):
+        x_length = self.max_location.x - self.min_location.x + 1
+        y_length = self.max_location.y - self.min_location.y + 1
+        return (x_length * y_length) - len(self._living_cells)
+
+    @property
+    def dimensions(self):
+        x_length = self.max_location.x - self.min_location.x + 1
+        y_length = self.max_location.y - self.min_location.y + 1
+        return (x_length, y_length)
+
+    @property
     def _living_cells(self):
         return [cell
                 for location, cell in self._cells.items()
@@ -82,15 +110,9 @@ class WorldRenderer():
     def render(self):
         living_locations = self.world.living_locations
 
-        if not living_locations:
-            return '-'
-
-        lower_bound_location = get_min_coordinates_location(living_locations)
-        upper_bound_location = get_max_coordinates_location(living_locations)
-
         sorted_locations = sort_locations(living_locations)
-        grid_locations = get_location_grid(lower_bound_location,
-                                           upper_bound_location)
+        grid_locations = get_location_grid(self.world.min_location,
+                                           self.world.max_location)
 
         rendering = ''
 
@@ -104,7 +126,7 @@ class WorldRenderer():
                                                  reverse=True)
 
         for y_coordinate, y_row_locations in grid_locations_sorted_by_y_desc:
-            if y_coordinate != upper_bound_location.y:
+            if y_coordinate != self.world.max_location.y:
                 rendering += '\n'
 
             rendering += self._render_row(y_row_locations, sorted_locations)
