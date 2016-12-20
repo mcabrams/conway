@@ -193,3 +193,6 @@ class WorldTestCase(unittest.TestCase):
 
         world.set_living_at(Location(0, -1))
         self.assertEqual(world.dimensions, (4, 5))
+
+    # TODO: check to make sure max/min location change as well when setting
+    # living cell somewhere.

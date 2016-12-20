@@ -9,6 +9,9 @@ class World():
     def __init__(self, min_location=DEFAULT_MIN_LOCATION,
                  max_location=DEFAULT_MAX_LOCATION):
         self._cells = {}
+        # consider allowing getting of min/max location, but restricting setting
+        # due to its tendency to potentially change when setting a living cell
+        # TODO: Consider moving location_grid to world
         self.min_location = min_location
         self.max_location = max_location
 
@@ -61,25 +64,19 @@ class World():
         return len(living_neighbor_cells)
 
     def tick(self):
-        # Shortcoming is that this only accounts for living cells
-        for location, cell in self._cells.items():
+        world_locations = LocationGrid(self.min_location,
+                                       self.max_location).locations
+
+        for location in world_locations:
+            cell = self.get_cell_at(location)
             neighbor_count = self._get_living_neighbor_count(location)
-            if not cell.is_alive_next_generation(neighbor_count):
-                cell.die()
+
+            if cell.is_alive_next_generation(neighbor_count):
+                self.set_living_at(location)
+            else:
+                self.set_dead_at(location)
 
         return self
-
-        # To handle shortcoming where we only iterate over cells that are in
-        # the living cell we need to incorporate some way of iterating over
-        # cells that are dead as well. One thought is to rely on getting a
-        # grid location (all possible locations) and then a sort location
-        # (which will cover living cells), and then we should be able to
-        # iterate over all. We likely need someway handling cells that are on
-        # the border of are grid (maybe not, we'll see). Another thought that
-        # comes to mind is whether the current model for location grid should
-        # be modified; in this case we really need a list of locations, and
-        # don't care much about the y/x index, but we do care about whether
-        # a  cell is dead or alive.
 
     @property
     def is_empty(self):
@@ -123,10 +120,10 @@ class WorldRenderer():
     def render(self):
         living_locations = self.world.living_locations
 
+        rendering = ''
+
         location_grid = LocationGrid(self.world.min_location,
                                      self.world.max_location)
-
-        rendering = ''
 
         for y_coordinate, y_row_locations in location_grid.rows.items():
             if y_coordinate != self.world.max_location.y:
