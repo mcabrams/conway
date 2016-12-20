@@ -1,5 +1,5 @@
 from .cell import Cell
-from .location import (LocationGrid, Location, sort_locations)
+from .location import LocationGrid, Location
 
 DEFAULT_MIN_LOCATION = Location(0, 0)
 DEFAULT_MAX_LOCATION = Location(0, 0)
@@ -123,26 +123,16 @@ class WorldRenderer():
     def render(self):
         living_locations = self.world.living_locations
 
-        sorted_locations = sort_locations(living_locations)
         location_grid = LocationGrid(self.world.min_location,
                                      self.world.max_location)
 
         rendering = ''
 
-        location_lists = sorted_locations.values()
-        sorted_locations = [sub_location
-                            for location_list in location_lists
-                            for sub_location in location_list]
-
-        grid_locations_sorted_by_y_desc = sorted(location_grid.rows.items(),
-                                                 key=lambda item: item[0],
-                                                 reverse=True)
-
-        for y_coordinate, y_row_locations in grid_locations_sorted_by_y_desc:
+        for y_coordinate, y_row_locations in location_grid.rows.items():
             if y_coordinate != self.world.max_location.y:
                 rendering += '\n'
 
-            rendering += self._render_row(y_row_locations, sorted_locations)
+            rendering += self._render_row(y_row_locations, living_locations)
 
         return rendering
 

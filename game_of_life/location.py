@@ -57,7 +57,16 @@ class LocationGrid:
     def rows(self):
         """ Returns dict with keys corresponding to x coordinates (ascending), and
         values that are lists of locations that fall in that x coordinate, in
-        ascending y coordinate value.
+        descending y coordinate value.
+        """
+        rows = sort_locations(self.locations)
+
+        return rows
+
+    @property
+    def locations(self):
+        """ Returns list with locations that all fall within in grids
+        given lower and upper bounds.
         """
         x_range = range(self.lower_bound_location.x,
                         self.upper_bound_location.x + 1)
@@ -69,15 +78,13 @@ class LocationGrid:
             for y in y_range:
                 locations.append(Location(x, y))
 
-        rows = sort_locations(locations)
-
-        return rows
+        return locations
 
 
 def sort_locations(locations):
     """ Returns dict with keys representing x-coordinate int, and value being
     a list of Locations containing that x-coordinate, sorted by y-coordinate
-    in ascending order """
+    in descending order """
 
     rows = OrderedDict()
 

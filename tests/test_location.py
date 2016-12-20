@@ -115,3 +115,11 @@ class LocationGridRowsTestCase(unittest.TestCase):
             (0, [Location(0, 0), Location(1, 0), Location(2, 0)])
         ])
         self.assertEqual(actual, expected)
+
+
+class LocationGridLocationsTestCase(unittest.TestCase):
+    def test_returns_proper_locations(self):
+        actual = LocationGrid(Location(0, 0), Location(1, 1)).locations
+        expected = [Location(0, 0), Location(1, 0), Location(0, 1),
+                    Location(1, 1)]
+        self.assertEqual(set(actual), set(expected))
