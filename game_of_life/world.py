@@ -64,14 +64,18 @@ class World():
         return len(living_neighbor_cells)
 
     def tick(self):
+        new_locations = []
         world_locations = LocationGrid(self.min_location,
                                        self.max_location).locations
 
         for location in world_locations:
             cell = self.get_cell_at(location)
             neighbor_count = self._get_living_neighbor_count(location)
+            is_alive_next_gen = cell.is_alive_next_generation(neighbor_count)
+            new_locations.append((location, is_alive_next_gen))
 
-            if cell.is_alive_next_generation(neighbor_count):
+        for location, is_alive in new_locations:
+            if is_alive:
                 self.set_living_at(location)
             else:
                 self.set_dead_at(location)

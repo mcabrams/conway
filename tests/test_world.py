@@ -141,6 +141,27 @@ class WorldTestCase(unittest.TestCase):
                          msg='\n\nExpected: \n{}\nBut instead got: \n{}'
                              .format(expected_render_after_tick, actual))
 
+    def test_ticks_account_for_world_prior_to_any_tick_changes(self):
+        # A tick should happen all at once. In other words, just because
+        # one cell comes to life, should not mean that that affects other cells
+        # that tick. All deaths/revivals should happen simulataneously
+        render = ('++-+\n' +
+                  '+-++\n' +
+                  '++-+\n' +
+                  '-+--')
+
+        expected_render_after_tick = ('++-+\n' +
+                                      '---+\n' +
+                                      '+--+\n' +
+                                      '+++-')
+
+        world = render_to_world(render)
+        world = world.tick()
+        actual = WorldRenderer(world).render()
+        self.assertEqual(expected_render_after_tick, actual,
+                         msg='\n\nExpected: \n{}\nBut instead got: \n{}'
+                             .format(expected_render_after_tick, actual))
+
     def test_an_empty_world_with_10_by_10_dimensions_has_100_dead_cells(self):
         world = World.empty(min_location=Location(0, 0),
                             max_location=Location(9, 9))

@@ -6,7 +6,7 @@ def render_to_world(render):
     if not render:
         return World.empty()
     else:
-        rows = render.split('\n')
+        rows = render.strip().split('\n')
         height = len(rows)
         width = len(rows[0])
         world = World.empty(min_location=Location(0, 0),

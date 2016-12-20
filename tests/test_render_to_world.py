@@ -28,6 +28,10 @@ class RenderToWorldTestCase(unittest.TestCase):
                                 '-+')
         self.assertEqual(world.dimensions, (2, 2))
 
+    def test_strips_white_space(self):
+        world = render_to_world('\n-\n')
+        self.assertEqual(world.dimensions, (1, 1))
+
     def test_spaced_living_row_cells_create_proper_world(self):
         world = render_to_world('+-+')
         for living, coordinates in [(True, (0, 0)),
