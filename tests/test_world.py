@@ -1,5 +1,4 @@
 import unittest
-from unittest.mock import Mock
 
 from game_of_life.cell import Cell
 from game_of_life.location import Location
