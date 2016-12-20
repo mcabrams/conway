@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import unittest
 
 from game_of_life.location import (LocationGrid, Location,
@@ -79,14 +80,22 @@ class SortLocationsTestCase(unittest.TestCase):
 
         self.assertEqual(dict(sorted_locations), expected)
 
+    def test_locations_sorted_properly_by_desc_y_index(self):
+        sorted_locations = sort_locations([Location(0, 5), Location(0, 3),
+                                           Location(0, 7)])
+        expected = OrderedDict([(7, [Location(0, 7)]), (5, [Location(0, 5)]),
+                                (3, [Location(0, 3)])])
+
+        self.assertEqual(sorted_locations, expected)
+
 
 class LocationGridGetRowsTestCase(unittest.TestCase):
     def test_same_start_end(self):
         actual = LocationGrid(Location(0, 0), Location(0, 0)).get_rows()
-        expected = {
+        expected = OrderedDict({
             0: [Location(0, 0)]
-        }
-        self.assertEqual(dict(actual), expected)
+        })
+        self.assertEqual(actual, expected)
 
     def test_with_proper_minimum_and_maximum(self):
         actual = LocationGrid(Location(0, 0), Location(2, 2)).get_rows()
@@ -96,3 +105,13 @@ class LocationGridGetRowsTestCase(unittest.TestCase):
             2: [Location(0, 2), Location(1, 2), Location(2, 2)]
         }
         self.assertEqual(dict(actual), expected)
+
+    def test_grid_rows_can_are_sorted_by_descending_y_index(self):
+        location_grid = LocationGrid(Location(0, 0), Location(2, 2))
+        actual = location_grid.get_rows()
+        expected = OrderedDict([
+            (2, [Location(0, 2), Location(1, 2), Location(2, 2)]),
+            (1, [Location(0, 1), Location(1, 1), Location(2, 1)]),
+            (0, [Location(0, 0), Location(1, 0), Location(2, 0)])
+        ])
+        self.assertEqual(actual, expected)

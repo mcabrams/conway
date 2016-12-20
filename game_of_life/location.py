@@ -1,4 +1,4 @@
-from collections import defaultdict, namedtuple
+from collections import OrderedDict, defaultdict, namedtuple
 
 
 class Location(namedtuple('Location', ['x', 'y'])):
@@ -58,8 +58,6 @@ class LocationGrid:
         values that are lists of locations that fall in that x coordinate, in
         ascending y coordinate value.
         """
-        rows = defaultdict(list)
-
         x_range = range(self.lower_bound_location.x,
                         self.upper_bound_location.x + 1)
         y_range = range(self.lower_bound_location.y,
@@ -80,9 +78,17 @@ def sort_locations(locations):
     a list of Locations containing that x-coordinate, sorted by y-coordinate
     in ascending order """
 
-    rows = defaultdict(list)
+    rows = OrderedDict()
 
-    for location in locations:
+    y_sorted_locations = sorted(locations, key=lambda location: location.y,
+                                reverse=True)
+
+    for location in y_sorted_locations:
+        try:
+            rows[location.y]
+        except KeyError:
+            rows[location.y] = []
+
         rows[location.y].append(location)
         rows[location.y].sort(key=lambda location: location.x)
 
