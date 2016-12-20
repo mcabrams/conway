@@ -89,16 +89,16 @@ class SortLocationsTestCase(unittest.TestCase):
         self.assertEqual(sorted_locations, expected)
 
 
-class LocationGridGetRowsTestCase(unittest.TestCase):
+class LocationGridRowsTestCase(unittest.TestCase):
     def test_same_start_end(self):
-        actual = LocationGrid(Location(0, 0), Location(0, 0)).get_rows()
+        actual = LocationGrid(Location(0, 0), Location(0, 0)).rows
         expected = OrderedDict({
             0: [Location(0, 0)]
         })
         self.assertEqual(actual, expected)
 
     def test_with_proper_minimum_and_maximum(self):
-        actual = LocationGrid(Location(0, 0), Location(2, 2)).get_rows()
+        actual = LocationGrid(Location(0, 0), Location(2, 2)).rows
         expected = {
             0: [Location(0, 0), Location(1, 0), Location(2, 0)],
             1: [Location(0, 1), Location(1, 1), Location(2, 1)],
@@ -108,7 +108,7 @@ class LocationGridGetRowsTestCase(unittest.TestCase):
 
     def test_grid_rows_can_are_sorted_by_descending_y_index(self):
         location_grid = LocationGrid(Location(0, 0), Location(2, 2))
-        actual = location_grid.get_rows()
+        actual = location_grid.rows
         expected = OrderedDict([
             (2, [Location(0, 2), Location(1, 2), Location(2, 2)]),
             (1, [Location(0, 1), Location(1, 1), Location(2, 1)]),

@@ -134,7 +134,7 @@ class WorldRenderer():
                             for location_list in location_lists
                             for sub_location in location_list]
 
-        grid_locations_sorted_by_y_desc = sorted(location_grid.get_rows().items(),
+        grid_locations_sorted_by_y_desc = sorted(location_grid.rows.items(),
                                                  key=lambda item: item[0],
                                                  reverse=True)
 

@@ -53,7 +53,8 @@ class LocationGrid:
         self.lower_bound_location = lower_bound_location
         self.upper_bound_location = upper_bound_location
 
-    def get_rows(self):
+    @property
+    def rows(self):
         """ Returns dict with keys corresponding to x coordinates (ascending), and
         values that are lists of locations that fall in that x coordinate, in
         ascending y coordinate value.
