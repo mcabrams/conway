@@ -215,5 +215,16 @@ class WorldTestCase(unittest.TestCase):
         world.set_living_at(Location(0, -1))
         self.assertEqual(world.dimensions, (4, 5))
 
+    def test_empty_world_has_0_living_cell_count(self):
+        world = World.empty()
+        self.assertEqual(world.living_cell_count, 0)
+
+    def test_can_get_a_random_world(self):
+        world = World.random(min_location=Location(0, 0),
+                             max_location=Location(3, 3),
+                             cell_count=12)
+
+        self.assertEqual(world.living_cell_count, 12)
+
     # TODO: check to make sure max/min location change as well when setting
     # living cell somewhere.

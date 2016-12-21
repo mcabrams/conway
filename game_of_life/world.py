@@ -1,3 +1,5 @@
+from random import randint
+
 from .cell import Cell
 from .location import LocationGrid, Location
 
@@ -18,6 +20,23 @@ class World():
     @classmethod
     def empty(cls, *args, **kwargs):
         return cls(*args, **kwargs)
+
+    @classmethod
+    def random(cls, *args, cell_count=1, **kwargs):
+        world = cls(*args, **kwargs)
+        for _ in range(cell_count):
+            world.randomly_set_living()
+
+        return world
+
+    def randomly_set_living(self):
+        x = randint(self.min_location.x, self.max_location.x)
+        y = randint(self.min_location.y, self.max_location.y)
+
+        if self.is_alive_at(Location(x, y)):
+            self.randomly_set_living()
+        else:
+            self.set_living_at(Location(x, y))
 
     def set_dead_at(self, location):
         cell = self._find_cell_at(location)
@@ -84,13 +103,17 @@ class World():
 
     @property
     def is_empty(self):
-        return len(self._living_cells) == 0
+        return self.living_cell_count == 0
 
     @property
     def dead_cell_count(self):
         x_length = self.max_location.x - self.min_location.x + 1
         y_length = self.max_location.y - self.min_location.y + 1
-        return (x_length * y_length) - len(self._living_cells)
+        return (x_length * y_length) - self.living_cell_count
+
+    @property
+    def living_cell_count(self):
+        return len(self._living_cells)
 
     @property
     def dimensions(self):
