@@ -1,7 +1,8 @@
 import unittest
 
 from game_of_life.location import Location
-from game_of_life.world import World, WorldRenderer
+from game_of_life.world import World
+from game_of_life.world_renderer import WorldRenderer
 
 
 class WorldRendererTestCase(unittest.TestCase):

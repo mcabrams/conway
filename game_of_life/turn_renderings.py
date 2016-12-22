@@ -1,4 +1,4 @@
-from .world import WorldRenderer
+from .world_renderer import WorldRenderer
 
 
 def turn_renderings(world, turns=1, animate=False):

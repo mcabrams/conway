@@ -3,7 +3,8 @@ import unittest
 from game_of_life.cell import Cell
 from game_of_life.location import Location
 from game_of_life.render_to_world import render_to_world
-from game_of_life.world import World, WorldRenderer
+from game_of_life.world import World
+from game_of_life.world_renderer import WorldRenderer
 
 
 def _get_location_cluster(cluster_number):
