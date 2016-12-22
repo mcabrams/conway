@@ -1,5 +1,8 @@
 from .location import LocationGrid
 
+LIVE_CELL_CHAR = ' +'
+DEAD_CELL_CHAR = ' -'
+
 
 class WorldRenderer():
     def __init__(self, world):
@@ -25,6 +28,7 @@ class WorldRenderer():
         rendering = ''
 
         for location in row_locations:
-            rendering += '+' if location in living_locations else '-'
+            is_alive = location in living_locations
+            rendering += LIVE_CELL_CHAR if is_alive else DEAD_CELL_CHAR
 
         return rendering

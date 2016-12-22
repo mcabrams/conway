@@ -6,6 +6,8 @@ from game_of_life.render_to_world import render_to_world
 from game_of_life.world import World
 from game_of_life.world_renderer import WorldRenderer
 
+from .test_world_renderer import RenderingTestsMixin
+
 
 def _get_location_cluster(cluster_number):
     location = Location(0, 0)
@@ -23,7 +25,7 @@ def _get_stable_world():
     return world
 
 
-class WorldTestCase(unittest.TestCase):
+class WorldTestCase(unittest.TestCase, RenderingTestsMixin):
     def setUp(self):
         self.location = Location(0, 0)
 
@@ -120,6 +122,7 @@ class WorldTestCase(unittest.TestCase):
         self.assertEqual(world.living_locations, [])
 
     def test_world_progresses_next_expected_outcome_after_a_tick(self):
+        self.set_living_and_dead_cells_to_plus_and_minus()
         render = ('-+-\n'
                   '--+')
         expected_render_after_tick = ('---\n'
@@ -143,6 +146,7 @@ class WorldTestCase(unittest.TestCase):
                              .format(expected_render_after_tick, actual))
 
     def test_ticks_account_for_world_prior_to_any_tick_changes(self):
+        self.set_living_and_dead_cells_to_plus_and_minus()
         # A tick should happen all at once. In other words, just because
         # one cell comes to life, should not mean that that affects other cells
         # that tick. All deaths/revivals should happen simulataneously
