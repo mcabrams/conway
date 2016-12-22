@@ -6,6 +6,20 @@ Simple Design"](https://leanpub.com/4rulesofsimpledesign).
 ## Getting Started
 Run:
 
-1: ```docker build -t conway .```
-2: ```docker run -v "$PWD":/conway -it conway bash```
-3; ```python -m unittest```
+1:
+
+```
+docker build -t conway .
+```
+
+2:
+
+```
+docker run -v "$PWD":/conway -it conway bash
+```
+
+3:
+
+```python -m unittest```
+OR
+```python play.py```
