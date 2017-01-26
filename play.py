@@ -6,7 +6,7 @@ from game_of_life.world import World
 
 
 def clear_stdout():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system('clear')
 
 
 def play_demo():
